@@ -1,0 +1,12 @@
+# Ignorar variables de entorno y claves privadas (nunca subir a GitHub)
+.env
+.env.local
+.env.*
+!.env.example
+
+# Archivos temporales del sistema
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+Subir_a_GitHub.bat

@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asistente de Redacción Docente — Comunicaciones Escolares Claras y Formales</title>
+  <meta name="description" content="Transforma tus ideas cotidianas en comunicaciones escolares claras, empáticas y formales en cuatro pasos guiados." />
+
+  <!-- Google Fonts: Heebo (600, 700) & Inter (400, 500, 600) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Librerías CDN para lectura de documentos (.PDF y .DOCX) y exportación (.PDF) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+
+  <!-- Hoja de estilos principal -->
+  <link rel="stylesheet" href="css/styles.css?v=13" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- CABECERA DEL DASHBOARD -->
+    <header class="app-header">
+      <div class="brand-cluster">
+        <div class="brand-emblem" aria-hidden="true">
+          <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+            <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+            <path d="M2 2l7.586 7.586"></path>
+            <circle cx="11" cy="11" r="2"></circle>
+          </svg>
+        </div>
+        <div class="brand-titles">
+          <div class="brand-title-row">
+            <h1 class="app-title">Asistente de Redacción Docente</h1>
+            <span class="privacy-pill" title="Todos tus textos y documentos se procesan localmente en tu navegador">
+              <span class="privacy-dot" aria-hidden="true"></span>
+              Sesión privada · Sin registro
+            </span>
+          </div>
+          <p class="app-subtitle">Transforma tus ideas cotidianas en comunicaciones escolares claras, empáticas y formales</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button type="button" id="btn-theme-toggle" class="btn btn-secondary btn-sm" aria-label="Alternar entre modo claro y modo oscuro">
+          <svg id="theme-icon-moon" class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <svg id="theme-icon-sun" class="btn-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <span id="theme-toggle-label">Modo oscuro</span>
+        </button>
+        <button type="button" id="btn-demo-fill" class="btn btn-secondary btn-sm">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+          <span>Cargar ejemplo de prueba</span>
+        </button>
+        <button type="button" id="btn-reset-all" class="btn btn-ghost btn-sm" title="Limpiar todos los campos y volver al paso 1">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+          </svg>
+          <span>Reiniciar</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- LAYOUT PRINCIPAL DIVIDIDO -->
+    <main class="dashboard-grid">
+      <!-- COLUMNA IZQUIERDA: PANEL DEL ASISTENTE GUIADO DE 4 PASOS -->
+      <section class="wizard-panel" aria-label="Asistente guiado de redacción en cuatro pasos">
+        <!-- Barra de progreso visual por pasos -->
+        <nav id="wizard-stepper" class="wizard-stepper" aria-label="Progreso del asistente">
+          <div class="stepper-list" role="list">
+            <button type="button" class="step-indicator active" data-step-indicator="1" data-step="1" aria-current="step">
+              <span class="step-number-pill">1</span>
+              <span class="step-label">1. Encabezado</span>
+            </button>
+            <button type="button" class="step-indicator" data-step-indicator="2" data-step="2">
+              <span class="step-number-pill">2</span>
+              <span class="step-label">2. Tu idea</span>
+            </button>
+            <button type="button" class="step-indicator" data-step-indicator="3" data-step="3">
+              <span class="step-number-pill">3</span>
+              <span class="step-label">3. Documento</span>
+            </button>
+            <button type="button" class="step-indicator" data-step-indicator="4" data-step="4">
+              <span class="step-number-pill">4</span>
+              <span class="step-label">4. Revisión</span>
+            </button>
+          </div>
+          <div class="stepper-progress-track" aria-hidden="true">
+            <div id="wizard-progress-bar" class="stepper-progress-fill" style="width: 25%;"></div>
+          </div>
+        </nav>
+
+        <div class="wizard-body">
+          <!-- ==========================================
+               PASO 1: DATOS DE ENCABEZADO
+               ========================================== -->
+          <div id="step-1" class="wizard-step" data-step-panel="1">
+            <div class="step-header">
+              <span class="step-badge-pill">Paso 1 de 4 · Datos básicos</span>
+              <h2 class="step-title">¿De parte de quién y para quién es el correo?</h2>
+              <p class="step-description">
+                Completa los tres datos esenciales del encabezado para que el saludo, la apertura y la firma del mensaje se adapten con naturalidad.
+              </p>
+            </div>
+
+            <div class="form-stack">
+              <!-- Campo 1: Remitente -->
+              <div class="form-field">
+                <label for="input-sender" class="field-label">
+                  Nombre y Apellido del usuario (Remitente)
+                  <span class="required-pill">Obligatorio</span>
+                </label>
+                <span class="field-hint">Cómo quieres firmar al pie del correo (puedes incluir tu cargo o asignatura).</span>
+                <input
+                  type="text"
+                  id="input-sender"
+                  class="text-input"
+                  placeholder="Ej. Prof. Martín Morales — Docente de Lenguaje"
+                  autocomplete="name"
+                  aria-describedby="err-sender"
+                />
+                <p id="err-sender" class="field-error hidden" role="alert"></p>
+              </div>
+
+              <!-- Campo 2: Asunto -->
+              <div class="form-field">
+                <label for="input-subject" class="field-label">
+                  Asunto del correo
+                  <span class="required-pill">Obligatorio</span>
+                </label>
+                <span class="field-hint">Una frase breve sobre el tema principal de tu comunicación.</span>
+                <input
+                  type="text"
+                  id="input-subject"
+                  class="text-input"
+                  placeholder="Ej. Solicitud de permiso administrativo y planificación de reemplazo"
+                  aria-describedby="err-subject"
+                />
+                <p id="err-subject" class="field-error hidden" role="alert"></p>
+              </div>
+
+              <!-- Campo 3: Destinatario -->
+              <div class="form-field">
+                <label for="input-recipient" class="field-label">
+                  Nombre del destinatario
+                  <span class="required-pill">Obligatorio</span>
+                </label>
+                <span class="field-hint">Persona, equipo directivo, colega o apoderado que recibirá el mensaje.</span>
+                <input
+                  type="text"
+                  id="input-recipient"
+                  class="text-input"
+                  placeholder="Ej. Sra. Directora Carmen Valdivia"
+                  aria-describedby="err-recipient"
+                />
+                <p id="err-recipient" class="field-error hidden" role="alert"></p>
+              </div>
+            </div>
+
+            <footer class="step-footer step-footer-end">
+              <button type="button" id="btn-next-1" class="btn btn-primary">
+                <span>Siguiente paso</span>
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </footer>
+          </div>
+
+          <!-- ==========================================
+               PASO 2: TU IDEA EN LENGUAJE NATURAL
+               ========================================== -->
+          <div id="step-2" class="wizard-step hidden" data-step-panel="2">
+            <div class="step-header">
+              <span class="step-badge-pill">Paso 2 de 4 · Desahogo tranquilo</span>
+              <h2 class="step-title">Cuéntanos tu idea en lenguaje cotidiano</h2>
+            </div>
+
+            <!-- Mensaje de bienvenida tranquilizador destacado -->
+            <div class="reassurance-banner" role="note">
+              <div class="reassurance-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </div>
+              <p class="reassurance-text">
+                Escribe aquí con tus propias palabras qué quieres decir, sin preocuparte por el orden ni la formalidad.
+              </p>
+            </div>
+
+            <!-- Sugerencias rápidas clicables -->
+            <div class="preset-section">
+              <span class="preset-label">O prueba con una situación frecuente:</span>
+              <div class="preset-pills-group" role="group" aria-label="Plantillas rápidas de ideas">
+                <button
+                  type="button"
+                  class="preset-pill"
+                  data-preset="permiso"
+                  data-idea="Necesito pedir este jueves en la mañana porque tengo hora al médico especialista a las 10:30 y me costó meses conseguirla. Ya hablé con la profesora Laura y dejé las guías listas para 6° básico."
+                >
+                  Permiso médico
+                </button>
+                <button
+                  type="button"
+                  class="preset-pill"
+                  data-preset="apoderado"
+                  data-idea="Quiero citar al apoderado de Tomás porque estas últimas dos semanas ha llegado sin sus materiales de trabajo y se le ve desmotivado en clases, pero quiero plantearlo con mucho cariño para apoyarlo juntos."
+                >
+                  Citación a apoderado
+                </button>
+                <button
+                  type="button"
+                  class="preset-pill"
+                  data-preset="direccion"
+                  data-idea="Necesito informar a dirección que terminamos la evaluación diagnóstica de lectura en 4° básico y detectamos que 7 estudiantes requieren apoyo focalizado en comprensión lectora durante el primer semestre."
+                >
+                  Informe a dirección
+                </button>
+              </div>
+            </div>
+
+            <!-- Área de texto amplia -->
+            <div class="form-field">
+              <label for="input-idea" class="field-label">
+                Tu borrador libre o notas sueltas
+                <span class="required-pill">Mínimo 15 caracteres</span>
+              </label>
+              <textarea
+                id="input-idea"
+                class="textarea-input"
+                rows="6"
+                placeholder="Ejemplo: Hola, necesito avisar que el viernes tengo control médico a las 9 de la mañana y llegaré al colegio cerca de las 11. Dejé la actividad de lectura impresa en sala de profesores para que el curso trabaje tranquilo..."
+                aria-describedby="idea-char-count err-idea"
+              ></textarea>
+
+              <div class="textarea-meta-row">
+                <span class="char-requirement-hint">Escribe al menos una frase breve (mín. 15 caracteres)</span>
+                <span id="idea-char-count" class="char-counter-pill">0 caracteres</span>
+              </div>
+              <p id="err-idea" class="field-error hidden" role="alert"></p>
+            </div>
+
+            <footer class="step-footer">
+              <button type="button" id="btn-prev-2" class="btn btn-secondary">
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="19" y1="12" x2="5" y2="12"></line>
+                  <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span>Anterior</span>
+              </button>
+              <button type="button" id="btn-next-2" class="btn btn-primary">
+                <span>Siguiente paso</span>
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </footer>
+          </div>
+
+          <!-- ==========================================
+               PASO 3: DOCUMENTO DE APOYO (OPCIONAL)
+               ========================================== -->
+          <div id="step-3" class="wizard-step hidden" data-step-panel="3">
+            <div class="step-header">
+              <div class="step-badge-row">
+                <span class="step-badge-pill">Paso 3 de 4 · Documento adjunto</span>
+                <span class="optional-step-pill">Paso 100% Opcional</span>
+              </div>
+              <h2 class="step-title">¿Quieres acompañar tu idea con un documento de referencia?</h2>
+            </div>
+
+            <!-- Bloque informativo visible con los 3 propósitos numerados -->
+            <div class="info-purposes-card">
+              <div class="info-purposes-header">
+                <span class="info-purposes-tag">Subir un archivo es completamente opcional</span>
+                <p class="info-purposes-intro">
+                  Puedes avanzar directamente al paso final sin adjuntar nada. Si decides cargar un archivo <strong>.PDF</strong> o <strong>.DOCX</strong>, podrás elegir exactamente para cuál de estos <strong>3 propósitos</strong> deseas utilizarlo:
+                </p>
+              </div>
+              <ol class="purposes-list">
+                <li class="purpose-item">
+                  <span class="purpose-num-pill">1</span>
+                  <span class="purpose-text">
+                    <strong>Identificar tu tono o forma de hablar:</strong> para replicar tu estilo personal y vocabulario habitual sin usar el contenido temático del archivo.
+                  </span>
+                </li>
+                <li class="purpose-item">
+                  <span class="purpose-num-pill">2</span>
+                  <span class="purpose-text">
+                    <strong>Utilizar el documento como base directa:</strong> para extraer los puntos clave, fechas o acuerdos del archivo e integrarlos en el cuerpo del correo.
+                  </span>
+                </li>
+                <li class="purpose-item">
+                  <span class="purpose-num-pill">3</span>
+                  <span class="purpose-text">
+                    <strong>Analizar la información para mayor complejidad:</strong> ideal para elaborar un correo técnico, formal o fundamentado en ámbitos administrativos y normativos.
+                  </span>
+                </li>
+              </ol>
+            </div>
+
+            <!-- Zona de carga interactiva Drag & Drop -->
+            <div class="upload-container">
+              <div
+                id="dropzone-area"
+                class="dropzone-area"
+                role="button"
+                tabindex="0"
+                aria-label="Zona para arrastrar y soltar un documento PDF o Word, o hacer clic para seleccionar desde tu equipo"
+              >
+                <input
+                  type="file"
+                  id="input-file"
+                  class="sr-only-input"
+                  accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                />
+                <div class="dropzone-icon-circle" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                </div>
+                <p class="dropzone-title">Arrastra tu archivo .PDF o .DOCX aquí</p>
+                <p class="dropzone-subtitle">O selecciona un documento desde tu computador (lectura local y privada)</p>
+                <span class="btn btn-secondary btn-sm dropzone-cta-btn">Explorar archivo</span>
+              </div>
+
+              <!-- Tarjeta de estado del archivo cargado (oculta por defecto) -->
+              <div id="file-loaded-badge" class="file-loaded-card hidden" aria-live="polite">
+                <div class="file-loaded-info">
+                  <div class="file-type-emblem" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <polyline points="9 15 11 17 15 13"></polyline>
+                    </svg>
+                  </div>
+                  <div class="file-loaded-text">
+                    <p id="file-name-label" class="file-name-label">documento.pdf</p>
+                    <p id="file-meta-label" class="file-meta-label">Documento procesado correctamente</p>
+                  </div>
+                </div>
+                <button type="button" id="btn-remove-file" class="btn btn-ghost btn-sm file-remove-btn" aria-label="Quitar archivo cargado">
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                  <span>Quitar archivo</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Sección Condicional de 3 Radio Cards (oculta por defecto) -->
+            <div id="doc-mode-section" class="doc-mode-section hidden" aria-live="polite">
+              <div class="doc-mode-header">
+                <h3 class="doc-mode-title">¿Cómo quieres que usemos este documento?</h3>
+                <p class="doc-mode-subtitle">Selecciona una de las tres modalidades de análisis para tu borrador:</p>
+              </div>
+
+              <div class="doc-mode-cards" role="radiogroup" aria-label=" Propósito del documento adjunto">
+                <!-- Opción A: Clonar Tono y Estilo Personal -->
+                <label class="mode-card selected" data-mode="tone">
+                  <input type="radio" name="doc-mode" value="tone" class="mode-radio-input" checked />
+                  <div class="mode-card-indicator" aria-hidden="true"></div>
+                  <div class="mode-card-content">
+                    <div class="mode-card-top">
+                      <span class="mode-card-title">Opción A — Clonar Tono y Estilo Personal</span>
+                      <span class="mode-tag-pill">Estilo propio</span>
+                    </div>
+                    <p class="mode-card-desc">
+                      Usar este documento únicamente para imitar mi forma de expresarme y mi vocabulario, ignorando por completo la información o temática del archivo.
+                    </p>
+                  </div>
+                </label>
+
+                <!-- Opción B: Base de Contenido -->
+                <label class="mode-card" data-mode="content">
+                  <input type="radio" name="doc-mode" value="content" class="mode-radio-input" />
+                  <div class="mode-card-indicator" aria-hidden="true"></div>
+                  <div class="mode-card-content">
+                    <div class="mode-card-top">
+                      <span class="mode-card-title">Opción B — Base de Contenido</span>
+                      <span class="mode-tag-pill">Insumo directo</span>
+                    </div>
+                    <p class="mode-card-desc">
+                      Usar la información de este documento como insumo directo para redactar el cuerpo del correo.
+                    </p>
+                  </div>
+                </label>
+
+                <!-- Opción C: Análisis para Gestión Administrativa/Compleja -->
+                <label class="mode-card" data-mode="admin">
+                  <input type="radio" name="doc-mode" value="admin" class="mode-radio-input" />
+                  <div class="mode-card-indicator" aria-hidden="true"></div>
+                  <div class="mode-card-content">
+                    <div class="mode-card-top">
+                      <span class="mode-card-title">Opción C — Análisis para Gestión Administrativa/Compleja</span>
+                      <span class="mode-tag-pill">Técnico / Normativo</span>
+                    </div>
+                    <p class="mode-card-desc">
+                      Analizar a fondo los datos, normativas o antecedentes del documento para estructurar un correo técnico, formal y de alta complejidad.
+                    </p>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <footer class="step-footer">
+              <button type="button" id="btn-prev-3" class="btn btn-secondary">
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="19" y1="12" x2="5" y2="12"></line>
+                  <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span>Anterior</span>
+              </button>
+              <button type="button" id="btn-next-3" class="btn btn-primary">
+                <span>Siguiente paso</span>
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </footer>
+          </div>
+
+          <!-- ==========================================
+               PASO 4: REVISIÓN Y CREACIÓN DEL MENSAJE
+               ========================================== -->
+          <div id="step-4" class="wizard-step hidden" data-step-panel="4">
+            <div class="step-header">
+              <span class="step-badge-pill">Paso 4 de 4 · Confirmación final</span>
+              <h2 class="step-title">Revisa los detalles antes de crear tu mensaje</h2>
+              <p class="step-description">
+                Verifica que los datos estén correctos. Al pulsar <strong>Crear Mensaje</strong>, el borrador aparecerá en el panel derecho listo para que edites cualquier palabra en vivo.
+              </p>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-grid">
+                <div class="summary-row">
+                  <span class="summary-label">Remitente (De)</span>
+                  <span id="summary-sender" class="summary-value">—</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label">Destinatario (Para)</span>
+                  <span id="summary-recipient" class="summary-value">—</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label">Asunto del correo</span>
+                  <span id="summary-subject" class="summary-value summary-value-strong">—</span>
+                </div>
+                <div class="summary-row summary-row-block">
+                  <span class="summary-label">Tu idea expresada</span>
+                  <p id="summary-idea" class="summary-idea-box">—</p>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label">Documento de apoyo</span>
+                  <span id="summary-doc" class="summary-doc-pill">Sin documento adjunto (redacción estándar)</span>
+                </div>
+              </div>
+            </div>
+
+            <footer class="step-footer">
+              <button type="button" id="btn-prev-4" class="btn btn-secondary">
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="19" y1="12" x2="5" y2="12"></line>
+                  <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span>Anterior</span>
+              </button>
+              <button type="button" id="btn-generate-email" class="btn btn-accent-cta">
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 20h9"></path>
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                </svg>
+                <span>Crear Mensaje</span>
+              </button>
+            </footer>
+          </div>
+        </div>
+      </section>
+
+      <!-- COLUMNA DERECHA: PANEL DE RESULTADO INTERACTIVO Y EXPORTACIÓN -->
+      <section class="editor-panel" aria-label="Borrador del correo y herramientas de exportación">
+        <!-- Cabecera del panel derecho -->
+        <div class="editor-panel-header">
+          <div class="editor-title-group">
+            <h2 class="editor-panel-title">Borrador del Correo</h2>
+            <span id="editor-status-badge" class="status-badge">Esperando datos</span>
+          </div>
+
+          <div class="export-toolbar" role="toolbar" aria-label="Acciones de exportación del correo">
+            <button type="button" id="btn-copy-email" class="btn btn-secondary btn-sm" disabled title="Copiar el correo al portapapeles">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span>Copiar</span>
+            </button>
+            <button type="button" id="btn-export-docx" class="btn btn-secondary btn-sm" disabled title="Descargar como documento de Word (.DOCX)">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="12" y1="18" x2="12" y2="12"></line>
+                <polyline points="9 15 12 18 15 15"></polyline>
+              </svg>
+              <span>Descargar .DOCX</span>
+            </button>
+            <button type="button" id="btn-export-pdf" class="btn btn-secondary btn-sm" disabled title="Descargar como documento PDF (.PDF)">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Descargar .PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Estado vacío calmado -->
+        <div id="editor-empty-state" class="editor-empty-state">
+          <div class="empty-state-card">
+            <div class="empty-state-emblem" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+            </div>
+            <h3 class="empty-state-title">Tu lienzo de edición en vivo</h3>
+            <p class="empty-state-text">
+              Completa los pasos a la izquierda y pulsa <strong>«Crear Mensaje»</strong>. Aquí aparecerá tu comunicación estructurada para que puedas revisar, reescribir o ajustar cualquier párrafo antes de copiarla o descargarla.
+            </p>
+            <div class="empty-state-features" aria-label="Características del lienzo">
+              <span class="feature-item"><span class="feature-check" aria-hidden="true">✓</span> Edición en vivo</span>
+              <span class="feature-sep" aria-hidden="true">·</span>
+              <span class="feature-item"><span class="feature-check" aria-hidden="true">✓</span> Exportación DOCX/PDF</span>
+              <span class="feature-sep" aria-hidden="true">·</span>
+              <span class="feature-item"><span class="feature-check" aria-hidden="true">✓</span> Tono formal</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contenedor del correo generado (oculto hasta generar) -->
+        <div id="editor-workspace" class="editor-workspace hidden">
+          <!-- Banda de metadatos del correo editable -->
+          <div class="email-envelope-card">
+            <div class="envelope-top-row">
+              <div class="envelope-meta-pair">
+                <span class="envelope-label">Para:</span>
+                <span id="preview-recipient" class="envelope-value">—</span>
+              </div>
+              <span id="preview-mode-pill" class="mode-applied-pill">Redacción Estándar</span>
+            </div>
+
+            <div class="envelope-meta-pair">
+              <span class="envelope-label">De:</span>
+              <span id="preview-sender" class="envelope-value">—</span>
+            </div>
+
+            <div class="envelope-subject-row">
+              <label for="editor-subject" class="envelope-label">Asunto:</label>
+              <input
+                type="text"
+                id="editor-subject"
+                class="envelope-subject-input"
+                placeholder="Asunto del correo..."
+              />
+            </div>
+          </div>
+
+          <!-- Cuadro Editable Interactivo en vivo -->
+          <div class="live-editor-wrapper">
+            <div class="live-editor-Subheader">
+              <span class="live-editor-hint">
+                <span class="live-indicator-dot" aria-hidden="true"></span>
+                Cuadro editable interactivo · Haz clic en cualquier párrafo para modificar el texto a tu gusto
+              </span>
+              <span id="editor-word-count" class="word-count-pill">0 palabras</span>
+            </div>
+
+            <div
+              id="email-live-editor"
+              class="email-live-editor"
+              contenteditable="true"
+              role="textbox"
+              aria-multiline="true"
+              aria-label="Cuerpo del correo editable en vivo"
+              spellcheck="true"
+            ></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- CONTENEDOR DE NOTIFICACIONES TOAST -->
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- SCRIPTS DE LA APLICACIÓN (Compatibles tanto en servidor local como abriendo index.html directamente) -->
+  <script src="js/document-processor.js?v=10"></script>
+  <script src="js/writing-engine.js?v=10"></script>
+  <script src="js/exporter.js?v=10"></script>
+  <script src="js/app.js?v=10"></script>
+</body>
+</html>
